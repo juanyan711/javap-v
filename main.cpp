@@ -13,5 +13,6 @@ int main(int argc, char *argv[])
 
 	Javapv w;
 	w.show();
+	w.activateWindow();
 	return a.exec();
 }

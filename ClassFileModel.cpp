@@ -1371,15 +1371,15 @@ void ClassFileModel::printClassAttributeInfo()
 void ClassFileModel::visit(const InstructionContext& context)
 {
 	QString parameteFormatter = context.formatter;
-	QString fullString;
 	QString codeName = context.codeName;
 	if (context.wide) {
 		codeName = codeName + "_w";
 	}
+	QString fullString = codeName.leftJustified(18, QChar(' '));
 	auto cpool = classFile->getConstantPool();
 	if (parameteFormatter.isEmpty() || parameteFormatter.size() == 0) {
 		if (context.opcode == Bytecodes::_lookupswitch) {
-			fullString.append(codeName).append("   {");
+			fullString.append("{ ");
 			map<const QString, int32_t>* s = static_cast<map<const QString, int32_t>*>(context.extra);
 			for (auto& itr : *s) {
 				fullString.append(QString::fromLocal8Bit(" %1:%2 ").arg(itr.first).arg(itr.second));
@@ -1387,17 +1387,17 @@ void ClassFileModel::visit(const InstructionContext& context)
 			fullString.append(" } ");
 		}
 		else if (context.opcode == Bytecodes::_tableswitch) {
-			fullString.append(codeName).append("   {");
+			fullString.append("{ ");
 			vector<int32_t>* v = static_cast<vector<int32_t>*>(context.extra);
 			int32_t size = v->size();
 			for (int32_t i = 0; i < size - 1; i++) {
 				fullString.append(QString::fromLocal8Bit(" %1:%2 ").arg(i).arg(v->at(i)));
 			}
 			fullString.append(QString::fromLocal8Bit(" %1:%2 ").arg("default").arg(v->at(size - 1)));
-			fullString.append(" } ");
+			fullString.append(" }");
 		}
 		else{
-			fullString.append(context.codeName + "  " + context.remark);
+			fullString.append(context.remark);
 		}
 	}
 	else {
@@ -1405,12 +1405,12 @@ void ClassFileModel::visit(const InstructionContext& context)
 			QString::compare("cc", parameteFormatter) == 0 ||
 			QString::compare("i", parameteFormatter) == 0 ||
 			QString::compare("ii", parameteFormatter) == 0) {
-			fullString.append(codeName).append("   ").append(QString::number(context.parameter1));
+			fullString.append(QString::number(context.parameter1));
 		}
 		else if (QString::compare("oo", parameteFormatter) == 0 ||
 			QString::compare("oooo", parameteFormatter) == 0) {
 			uint32_t o1 = context.offset + context.parameter1;
-			fullString.append(codeName).append(" ").append(QString::number(o1));
+			fullString.append(QString::number(o1));
 		}
 		else if (QString::compare("JJ", parameteFormatter) == 0 
 			|| QString::compare("k", parameteFormatter) == 0
@@ -1418,20 +1418,20 @@ void ClassFileModel::visit(const InstructionContext& context)
 			uint16_t index = context.parameter1;
 			auto info = cpool->at(index);
 			auto type = ConstantTag::translate(info->getTag(), false);
-			fullString.append(codeName).append(" #").append(QString::number(index)).append("          //").append(type).append("   ").append(info->toString());
+			fullString.append("#").append(QString::number(index)).append("          //").append(type).append("   ").append(info->toString());
 		}
 		else if (QString::compare("JJJJ", parameteFormatter) == 0) {
 			uint16_t index = context.parameter1;
 			auto dynamicInfoText = cpool->getGeneral(index);
-			fullString.append(codeName).append("  #").append(QString::number(index)).append(", 0          // InvokeDynamic  ").append(dynamicInfoText);
+			fullString.append("#").append(QString::number(index)).append(",  0          // InvokeDynamic  ").append(dynamicInfoText);
 		}
 		else if (QString::compare("JJ__", parameteFormatter) == 0) {
 			uint16_t index = context.parameter1;
 			auto interfaceText = cpool->getGeneral(context.parameter1);
-			fullString.append(codeName).append("  #").append(QString::number(index)).append(",  2         // InterfaceMethod ").append(interfaceText);
+			fullString.append("#").append(QString::number(index)).append(",  2         // InterfaceMethod ").append(interfaceText);
 		}
 		else if (context.opcode == Bytecodes::_iinc) {
-			fullString.append(codeName).append(QString::fromLocal8Bit("        %1  %2")
+			fullString.append(QString::fromLocal8Bit("%1,  %2")
 				                                          .arg(QString::number(context.parameter1))
 				                                          .arg(QString::number(context.parameter2)));
 		}
@@ -1439,15 +1439,15 @@ void ClassFileModel::visit(const InstructionContext& context)
 			uint16_t index = context.parameter1;
 			auto info = cpool->at(index);
 			auto type = ConstantTag::translate(info->getTag(), false);
-			fullString.append(codeName).append(QString::fromLocal8Bit("  #%1  %2").arg(QString::number(index)).arg(QString::number(context.parameter2)))
+			fullString.append(QString::fromLocal8Bit("#%1,  %2").arg(QString::number(index)).arg(QString::number(context.parameter2)))
 				                       .append("          //").append(type).append("  ").append(info->toString());
 
 		}
 		else {
-			fullString.append(codeName).append(" "+context.remark);
+			fullString.append(context.remark);
 		}
 	}
-	items.push_back(createItemNode( QString::fromUtf8(u8"             %1:  %2").arg(context.offset, 5, 10, QChar(' ') ).arg(fullString) ));
+	items.push_back(createItemNode( QString::fromUtf8(u8"             %1: %2").arg(context.offset, 5, 10, QChar(' ') ).arg(fullString) ));
 }
 
 std::vector<QString> ClassFileModel::getMethodExceptions(const std::vector<std::shared_ptr<AttributeInfo>>& attrs, const ConstantPool* cpool)
