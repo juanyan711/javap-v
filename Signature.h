@@ -61,6 +61,7 @@ namespace jdk {
 		void accept(SignatureVisitorPointer v);
 
 		static QString getSignature(const AttributeInfo& attrInfo, const ConstantPool& cpool);
+		static uint16_t getSignatureConstantIndex(const AttributeInfo& attrInfo, const ConstantPool& cpool);
 	private:
 		uint32_t parseType(QString& signature, int pos,
 			SignatureVisitorPointer v);
@@ -99,9 +100,12 @@ namespace jdk {
 	};
 
 	class MethodSignatureVisitor :public SignatureVisitor {
-		enum Step { start, paramter, returnParamter, throws };
+		enum Step { start, formal, paramter, returnParamter, throws };
 	public:
 		MethodSignatureVisitor();
+		void visitFormalTypeParameter(QString& name) override;
+		SignatureVisitorPointer visitClassBound() override;
+		SignatureVisitorPointer visitInterfaceBound() override;
 		SignatureVisitorPointer visitParameterType() override;
 		void visitBaseType(QChar& descriptor) override;
 		void visitTypeVariable(QString& name) override;
@@ -118,10 +122,12 @@ namespace jdk {
 		QString getParamSignature();
 		QString getRetureSignature();
 		QString getThrowsSignature();
+		QString getTypeParameters();
 
 	private:
 		Step s;
-		int32_t returnOffset = -1;
+		int32_t paramOffset = 0;
+		int32_t returnOffset = 0;
 		int32_t throwsOffset = -1;
 		QString buffer;
 		bool lastIsClass = false;

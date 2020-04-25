@@ -14,6 +14,16 @@ QString jdk::SignatureReader::getSignature(const AttributeInfo& attrInfo, const 
 	return cpool.getUtf8(utf8Index);
 }
 
+uint16_t jdk::SignatureReader::getSignatureConstantIndex(const AttributeInfo& attrInfo, const ConstantPool& cpool)
+{
+	uint16_t utf8Index = 0;
+	attrInfo.visit([&utf8Index](std::shared_ptr<const AttributeInfo> info) {
+		const char* body = info->getBody();
+		utf8Index = Util::readUnsignedInt16(body, 0);
+		});
+	return utf8Index;
+}
+
 jdk::SignatureReader::SignatureReader(QString& v):signatureValue(v)
 {
 }
@@ -242,7 +252,6 @@ void jdk::ClassSignatureVisitor::visitFormalTypeParameter(QString& name)
 		buffer.append(", ");
 	}
 	buffer.append(name);
-	
 }
 
 SignatureVisitorPointer jdk::ClassSignatureVisitor::visitClassBound()
@@ -375,14 +384,48 @@ jdk::MethodSignatureVisitor::MethodSignatureVisitor():s(Step::start),returnOffse
 {
 }
 
-SignatureVisitorPointer jdk::MethodSignatureVisitor::visitParameterType()
+void jdk::MethodSignatureVisitor::visitFormalTypeParameter(QString& name)
 {
 	if (s == Step::start) {
+		s = Step::formal;
+		buffer.append("<");
+	}
+	else if (s == Step::formal) {
+		buffer.append(", ");
+	}
+	buffer.append(name);
+
+}
+
+SignatureVisitorPointer jdk::MethodSignatureVisitor::visitClassBound()
+{
+	buffer.append(" extends ");
+	return SignatureVisitor::visitClassBound();
+}
+
+SignatureVisitorPointer jdk::MethodSignatureVisitor::visitInterfaceBound()
+{
+	if (s == Step::formal) {
+		buffer.append(" & ");
+	}
+	return SignatureVisitor::visitInterfaceBound();
+}
+
+SignatureVisitorPointer jdk::MethodSignatureVisitor::visitParameterType()
+{
+	if (s == Step::formal) {
 		s = Step::paramter;
+		buffer.append(">");
+		paramOffset = buffer.size();
+	}
+	else if(s == Step::start) {
+		s = Step::paramter;
+		paramOffset = 0;
 	}
 	else {
 		buffer.append(", ");
 	}
+	
 	return SignatureVisitor::visitParameterType();
 }
 
@@ -477,18 +520,31 @@ SignatureVisitorPointer jdk::MethodSignatureVisitor::visitExceptionType()
 
 QString jdk::MethodSignatureVisitor::getRetureSignature()
 {
-	return buffer.mid(returnOffset, throwsOffset - returnOffset);
+	if (throwsOffset > 0) {
+		return buffer.mid(returnOffset, throwsOffset - returnOffset);
+	}
+	else {
+		return buffer.mid(returnOffset, buffer.size() - returnOffset);
+	}
 }
 
 QString jdk::MethodSignatureVisitor::getParamSignature()
 {
-	return buffer.mid(0, returnOffset);
+	return buffer.mid(paramOffset, returnOffset- paramOffset);
 }
 
 QString jdk::MethodSignatureVisitor::getThrowsSignature()
 {
 	if (throwsOffset > 0) {
 		return buffer.mid(throwsOffset, buffer.size() - throwsOffset);
+	}
+	return QString();
+}
+
+QString jdk::MethodSignatureVisitor::getTypeParameters()
+{
+	if (paramOffset > 0) {
+		return buffer.mid(0, paramOffset);
 	}
 	return QString();
 }

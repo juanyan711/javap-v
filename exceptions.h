@@ -24,5 +24,9 @@ private:
 
 #define FILE_INFO __FILE__, __LINE__
 
+#define FINALLY  catch (...) { \
+   QMessageBox::warning(this, QString::fromLocal8Bit("´íÎó"), QString::fromLocal8Bit("Î´Öª´íÎó, ÇëÖØÆô")); \
+}
+
 }
 

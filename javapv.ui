@@ -6,15 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>747</width>
-    <height>653</height>
+    <width>963</width>
+    <height>645</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>javap-v</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="javapv.qrc">
+    <normaloff>:/images/Resources/images/coffe128.ico</normaloff>:/images/Resources/images/coffe128.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
     <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
@@ -26,16 +30,22 @@
       <widget class="QTreeView" name="nTree">
        <property name="minimumSize">
         <size>
-         <width>80</width>
+         <width>100</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>120</width>
+         <width>200</width>
          <height>16777215</height>
         </size>
        </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustToContents</enum>
+       </property>
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
       </widget>
       <widget class="QListView" name="vView">
        <property name="minimumSize">
@@ -50,15 +60,62 @@
          <height>16777215</height>
         </size>
        </property>
-      </widget>
-      <widget class="QListView" name="bView">
-       <property name="maximumSize">
-        <size>
-         <width>160</width>
-         <height>16777215</height>
-        </size>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOn</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOn</enum>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QAbstractScrollArea::AdjustToContents</enum>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SingleSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectRows</enum>
        </property>
       </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTableView" name="bView">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QHeaderView::section{border: 0px solid white;}</string>
+      </property>
+      <property name="showGrid">
+       <bool>false</bool>
+      </property>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>2</number>
+      </attribute>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>24</number>
+      </attribute>
+      <attribute name="horizontalHeaderHighlightSections">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
      </widget>
     </item>
    </layout>
@@ -68,7 +125,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>747</width>
+     <width>963</width>
      <height>22</height>
     </rect>
    </property>
@@ -77,8 +134,8 @@
      <string>文件</string>
     </property>
     <addaction name="action_open"/>
-    <addaction name="separator"/>
     <addaction name="action_close"/>
+    <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
    <widget class="QMenu" name="menu_2">
@@ -87,15 +144,7 @@
     </property>
     <addaction name="action_about"/>
    </widget>
-   <widget class="QMenu" name="menu_3">
-    <property name="title">
-     <string>编辑</string>
-    </property>
-    <addaction name="action_copy"/>
-    <addaction name="action_select_all"/>
-   </widget>
    <addaction name="menu"/>
-   <addaction name="menu_3"/>
    <addaction name="menu_2"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -107,8 +156,7 @@
    </attribute>
    <addaction name="action_open"/>
    <addaction name="action_close"/>
-   <addaction name="action_copy"/>
-   <addaction name="action_test"/>
+   <addaction name="action_check"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_open">
@@ -151,14 +199,6 @@
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="action_select_all">
-   <property name="text">
-    <string>全选</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+A</string>
-   </property>
-  </action>
   <action name="action_test">
    <property name="text">
     <string>测试</string>
@@ -168,6 +208,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+T</string>
+   </property>
+  </action>
+  <action name="action_check">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>校验版本</string>
+   </property>
+   <property name="toolTip">
+    <string>只允许加载jdk8的版本</string>
    </property>
   </action>
  </widget>

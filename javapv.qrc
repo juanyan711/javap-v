@@ -1,4 +1,7 @@
 <RCC>
-    <qresource prefix="javapv">
+    <qresource prefix="/images">
+        <file>Resources/images/coffe.jpg</file>
+        <file>Resources/images/coffe64.ico</file>
+        <file>Resources/images/coffe128.ico</file>
     </qresource>
 </RCC>
