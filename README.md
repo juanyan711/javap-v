@@ -1,7 +1,7 @@
 # javap-v
     github下载有时速度有点慢, 程序已经上传到百度云, 下载链接: https://pan.baidu.com/s/1BKF753IsLfU200VWdVGDkQ (提取码：kerl)  
     
-![DEMO](https://raw.githubusercontent.com/juanyan711/javap-v/master/Resources/images/demo.png)
+![DEMO](https://s1.ax1x.com/2020/04/25/J6PHot.png)
 
     javap-v的第一目标是完全替换javap这个系统工具, 提供比javap更加友好的输出展示, 是javap的GUI版本, 脱离jdk环境独立运行. 在优化展  
     示的前提下, javap-v完全等效于 javap -v 参数下的输出. 
