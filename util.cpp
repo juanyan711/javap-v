@@ -66,9 +66,12 @@ QString Util::javaClassName(QString constantName)
 {
 	bool isArray = false;
 	QString javaName;
-	if (constantName.startsWith("[")) {
+	
+	int32_t vdo = 0;
+	while (constantName.startsWith("[")) {
 		isArray = true;
 		constantName = constantName.mid(1, constantName.size() - 1);
+		vdo++;
 	}
 	if (constantName.startsWith("L")) {
 		javaName = constantName.mid(1, constantName.size() - 2).replace("/", ".");
@@ -79,7 +82,10 @@ QString Util::javaClassName(QString constantName)
 
 	if (isArray) {
 		isArray = false;
-		javaName += "[]";
+		while (vdo>0) {
+			javaName += "[]";
+			vdo--;
+		}
 	}
 	return javaName;
 }

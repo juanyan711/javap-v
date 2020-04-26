@@ -7,6 +7,7 @@
 #include<vector>
 #include<tuple>
 
+using std::vector;
 
 namespace jdk {
 
@@ -77,7 +78,9 @@ namespace jdk {
 		SignatureVisitorPointer visitClassBound() override;
 		void visitClassType(QString& name) override;
 		void visitInnerClassType(QString& name) override;
+		void visitEnd() override;
 		void visitBaseType(QChar&) override;
+		SignatureVisitorPointer visitArrayType() override;
 		QString toString();
 		SignatureVisitorPointer visitSuperclass() override;
 		SignatureVisitorPointer visitInterface() override;
@@ -85,7 +88,7 @@ namespace jdk {
 		void visitTypeVariable(QString& name) override;
 		void visitTypeArgument() override;
 		SignatureVisitorPointer visitTypeArgument(QChar&) override;
-		void visitEnd() override;
+		
 
 		void setFieldModel();
 
@@ -93,9 +96,11 @@ namespace jdk {
 	private:
 		Step s;
 		QString buffer;
-		uint32_t open = 0;
+		int32_t open = 0;
+		vector<int32_t> openStack;
+		int32_t vdo = 0;
+		vector<int32_t> vdoStack;
 		bool fieldModel = false;
-		bool lastIsClass = false;
 
 	};
 
@@ -112,9 +117,10 @@ namespace jdk {
 		SignatureVisitorPointer visitArrayType() override;
 		void visitClassType(QString& name) override;
 		void visitInnerClassType(QString& name) override;
+		void visitEnd();
+
 		void visitTypeArgument() override;
 		SignatureVisitorPointer visitTypeArgument(QChar& wildcard) override;
-		void visitEnd();
 
 		SignatureVisitorPointer visitReturnType() override;
 		SignatureVisitorPointer visitExceptionType() override;
@@ -130,8 +136,10 @@ namespace jdk {
 		int32_t returnOffset = 0;
 		int32_t throwsOffset = -1;
 		QString buffer;
-		bool lastIsClass = false;
-		uint32_t open = 0;
+		int32_t open = 0;
+		vector<int32_t> openStack;
+		int32_t vdo = 0;
+		vector<int32_t> vdoStack;
 	};
 
 

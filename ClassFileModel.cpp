@@ -280,23 +280,7 @@ void ClassFileModel::printField(FieldInfo* fieldInfo)
 	}
 	else {
 		//若是没有signature,就用descript
-		bool isArray = false;
-		QString temp = descriptor;
-		if (temp.startsWith("[")) {
-			isArray = true;
-			temp = temp.mid(1, temp.size() - 1);
-		}
-		if (temp.startsWith("L")) {
-			type = temp.mid(1, temp.size() - 2).replace("/", ".");
-		}
-		else {
-			type = Util::baseTypeName(temp.at(0));
-		}
-
-		if (isArray) {
-			isArray = false;
-			type += "[]";
-		}
+		type = Util::javaClassName(descriptor);
 	}
 
 	buffer.append(type);
@@ -394,22 +378,7 @@ void ClassFileModel::printMethod(MethodInfo* method)
 		QString right = descript.mid(rightIndex+1, descript.size() - rightIndex-1);
 		QString param = descript.mid(1, rightIndex-1);
 
-		bool isArray = false;
-		if (right.startsWith("[")) {
-			isArray = true;
-			right = right.mid(1, right.size() - 1);
-		}
-		if (right.startsWith("L")) {
-			methodReturn = right.mid(1, right.size() - 2).replace("/", ".");
-		}
-		else {
-			methodReturn = Util::baseTypeName(right.at(0));
-		}
-
-		if (isArray) {
-			isArray = false;
-			methodReturn += "[]";
-		}
+		methodReturn = Util::javaClassName(right);
 
 		if (!param.isEmpty()) {
 			int32_t offset = 0;
@@ -421,27 +390,20 @@ void ClassFileModel::printMethod(MethodInfo* method)
 				else {
 					first = false;
 				}
-				if (param.at(offset) == '[') {
-					isArray = true;
-					offset++;
-				}
-				QString current;
-				if (param.at(offset) == 'L') {
+				QString type;
+				if (param.at(offset) == '[' ||
+					param.at(offset) == 'L') {
 					int32_t index = param.indexOf(QChar(';'), offset);
-					current = param.mid(offset+1, index - offset-1).replace("/", ".");
+					QString current = param.mid(offset, index - offset);
 					offset = index + 1;
+					type = Util::javaClassName(current);
 				}
 				else {
-					current = Util::baseTypeName(param.at(offset));
+					type = Util::baseTypeName(param.at(offset));
 					offset++;
 				}
 
-				if (isArray) {
-					isArray = false;
-					current.append("[]");
-				}
-
-				methodParamter.append(current);
+				methodParamter.append(type);
 			}
 		}
 	}

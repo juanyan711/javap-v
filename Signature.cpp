@@ -264,24 +264,48 @@ void jdk::ClassSignatureVisitor::visitClassType(QString& name)
 {
 	auto name2 = name.replace("/", ".");
 	buffer.append(name2);
-	lastIsClass = true;
+	vdoStack.push_back(vdo);
+	vdo = 0;
+	openStack.push_back(open);
+	open = 0;
 }
 
 void jdk::ClassSignatureVisitor::visitInnerClassType(QString& name)
 {
 	//auto name2 = name.replace("/", ".");
-	if (open > 0) {
+	while (open > 0) {
 		buffer.append(">");
 		open--;
 	}
 	buffer.append(".");
 	buffer.append(name);
-	lastIsClass = true;
+}
+
+void jdk::ClassSignatureVisitor::visitEnd()
+{
+	int32_t cvdo = *(vdoStack.crbegin());
+	vdoStack.pop_back();
+	while (cvdo > 0) {
+		buffer.append("[]");
+		cvdo--;
+	}
+	while (open > 0) {
+		buffer.append(">");
+		open--;
+	}
+	open = *openStack.crbegin();
+	openStack.pop_back();
 }
 
 void jdk::ClassSignatureVisitor::visitBaseType(QChar& b)
 {
 	buffer.append(Util::baseTypeName(b));
+}
+
+SignatureVisitorPointer jdk::ClassSignatureVisitor::visitArrayType()
+{
+	vdo++;
+	return SignatureVisitor::visitArrayType();
 }
 
 QString jdk::ClassSignatureVisitor::toString()
@@ -329,18 +353,27 @@ SignatureVisitorPointer jdk::ClassSignatureVisitor::visitInterfaceBound()
 void jdk::ClassSignatureVisitor::visitTypeVariable(QString& name)
 {
 	buffer.append(name);
-	lastIsClass = false;
+	while (vdo > 0) {
+		buffer.append("[]");
+		vdo--;
+	}
 }
 
 void jdk::ClassSignatureVisitor::visitTypeArgument()
 {
-	buffer.append("<?");
-	open++;
+	if (open == 0) {
+		buffer.append("<");
+		open++;
+	}
+	else {
+		buffer.append(", ");
+	}
+	buffer.append("?");
 }
 
 SignatureVisitorPointer jdk::ClassSignatureVisitor::visitTypeArgument(QChar& c)
 {
-	if (lastIsClass) {
+	if (open == 0) {
 		buffer.append("<");
 		open++;
 	}
@@ -356,14 +389,6 @@ SignatureVisitorPointer jdk::ClassSignatureVisitor::visitTypeArgument(QChar& c)
 	}
 
 	return SignatureVisitor::visitTypeArgument(c);
-}
-
-void jdk::ClassSignatureVisitor::visitEnd()
-{
-	if (open>0) {
-		buffer.append(">");
-		open--;
-	}
 }
 
 void jdk::ClassSignatureVisitor::setFieldModel()
@@ -437,11 +462,15 @@ void jdk::MethodSignatureVisitor::visitBaseType(QChar& b)
 void jdk::MethodSignatureVisitor::visitTypeVariable(QString& name)
 {
 	buffer.append(name);
-	lastIsClass = false;
+	while (vdo > 0) {
+		buffer.append("[]");
+		vdo--;
+	}
 }
 
 SignatureVisitorPointer jdk::MethodSignatureVisitor::visitArrayType()
 {
+	vdo++;
 	return SignatureVisitor::visitArrayType();
 }
 
@@ -449,29 +478,53 @@ void jdk::MethodSignatureVisitor::visitClassType(QString& name)
 {
 	auto name2 = name.replace("/", ".");
 	buffer.append(name2);
-	lastIsClass = true;
+	vdoStack.push_back(vdo);
+	vdo = 0;
+	openStack.push_back(open);
+	open = 0;
 }
 
 void jdk::MethodSignatureVisitor::visitInnerClassType(QString& name)
 {
-	if (open > 0) {
+	while (open > 0) {
 		buffer.append(">");
 		open--;
 	}
 	buffer.append(".");
 	buffer.append(name);
-	lastIsClass = true;
+}
+
+void jdk::MethodSignatureVisitor::visitEnd()
+{
+	int32_t cvdo = *(vdoStack.crbegin());
+	vdoStack.pop_back();
+	while (cvdo > 0) {
+		buffer.append("[]");
+		cvdo--;
+	}
+	while (open > 0) {
+		buffer.append(">");
+		open--;
+	}
+	open = *openStack.crbegin();
+	openStack.pop_back();
 }
 
 void jdk::MethodSignatureVisitor::visitTypeArgument()
 {
-	buffer.append("<?");
-	open++;
+	if (open == 0) {
+		buffer.append("<");
+		open++;
+	}
+	else {
+		buffer.append(", ");
+	}
+	buffer.append("?");
 }
 
 SignatureVisitorPointer jdk::MethodSignatureVisitor::visitTypeArgument(QChar& c)
 {
-	if (lastIsClass) {
+	if (open == 0) {
 		buffer.append("<");
 		open++;
 	}
@@ -487,14 +540,6 @@ SignatureVisitorPointer jdk::MethodSignatureVisitor::visitTypeArgument(QChar& c)
 	}
 
 	return SignatureVisitor::visitTypeArgument(c);
-}
-
-void jdk::MethodSignatureVisitor::visitEnd()
-{
-	if (open > 0) {
-		buffer.append(">");
-		open--;
-	}
 }
 
 SignatureVisitorPointer jdk::MethodSignatureVisitor::visitReturnType()
