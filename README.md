@@ -3,7 +3,7 @@
 
 ![DEMO](https://s1.ax1x.com/2020/04/25/J6PHot.png)
 
-    要是DEMO图片看不到，可以直接访问: https://s1.ax1x.com/2020/04/25/J6PHot.png 查看
+    要是DEMO图片看不到，可以直接访问: https://s1.ax1x.com/2020/04/25/J6PHot.png 查看. 或者在hosts中添加github的域名映射.
     
     javap-v的第一目标是完全替换javap这个系统工具, 提供比javap更加友好的输出展示和可操作性, 是javap的GUI版本. 其脱离jdk环境独  
     立运行. 在优化展示的前提下, javap-v完全等效于 javap -v 参数下的输出. 
