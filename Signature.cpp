@@ -300,6 +300,10 @@ void jdk::ClassSignatureVisitor::visitEnd()
 void jdk::ClassSignatureVisitor::visitBaseType(QChar& b)
 {
 	buffer.append(Util::baseTypeName(b));
+	while (vdo > 0) {
+		buffer.append("[]");
+		vdo--;
+	}
 }
 
 SignatureVisitorPointer jdk::ClassSignatureVisitor::visitArrayType()
@@ -457,6 +461,10 @@ SignatureVisitorPointer jdk::MethodSignatureVisitor::visitParameterType()
 void jdk::MethodSignatureVisitor::visitBaseType(QChar& b)
 {
 	buffer.append(Util::baseTypeName(b));
+	while (vdo > 0) {
+		buffer.append("[]");
+		vdo--;
+	}
 }
 
 void jdk::MethodSignatureVisitor::visitTypeVariable(QString& name)
